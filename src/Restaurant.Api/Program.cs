@@ -8,6 +8,8 @@ using Restaurant.Api.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Logging.AddFilter("LuckyPennySoftware.MediatR.License", LogLevel.None);
+
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure();
 
