@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 namespace Restaurant.Api.Core.Entities;
 
 public class Section {
