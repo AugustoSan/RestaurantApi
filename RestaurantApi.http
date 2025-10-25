@@ -1,0 +1,6 @@
+@ChicleApi_HostAddress = http://localhost:5216
+
+GET {{ChicleApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
