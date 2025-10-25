@@ -11,7 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Logging.AddFilter("LuckyPennySoftware.MediatR.License", LogLevel.None);
 
 builder.Services.AddApplication();
-builder.Services.AddInfrastructure();
+builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddControllers();
 
