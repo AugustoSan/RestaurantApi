@@ -2,8 +2,8 @@ using Restaurant.Api.Core.Entities;
 namespace Restaurant.Api.Core.Interfaces;
 
 public interface IProductRepository {
-    Task<List<Product>> GetAllProducts();
-    Task<List<Section>> GetSections();
-    Task<List<Product>> GetAllProductsBySectionId(Guid sectionId);
+    Task AddProduct(Guid categoryId, Product product);
+    Task UpdateProduct(Guid categoryId, Guid id, Product product);
+    Task DeleteProduct(Guid categoryId, Guid id);
 }
 

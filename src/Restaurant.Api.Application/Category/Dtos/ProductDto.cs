@@ -1,4 +1,4 @@
-namespace Restaurant.Api.Application.Products.Dtos;
+namespace Restaurant.Api.Application.Category.Dtos;
 
 public class ProductDto {
     public required string Id { get; set; }

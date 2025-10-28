@@ -6,22 +6,22 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Restaurant.Api.Application.Products.Queries.GetAllProductsQuery;
+using Restaurant.Api.Application.Categories.Queries.GetAllCategories;
 
 namespace Restaurant.Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class ProductController(IMediator mediator, ILogger<ProductController> logger) : ControllerBase
+    public class CategoryController(IMediator mediator, ILogger<CategoryController> logger) : ControllerBase
     {
         private readonly IMediator _mediator = mediator;
-        private readonly ILogger<ProductController> _logger = logger;
+        private readonly ILogger<CategoryController> _logger = logger;
 
 
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            return Ok(await _mediator.Send(new GetAllProductsQuery()));
+            return Ok(await _mediator.Send(new GetAllCategoriesQuery()));
         }
     }
 }
