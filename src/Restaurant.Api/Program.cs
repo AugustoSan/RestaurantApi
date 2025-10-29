@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -21,6 +22,24 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// builder.WebHost.ConfigureKestrel(serverOptions =>
+// {
+//     serverOptions.ListenAnyIP(80);
+//     serverOptions.ListenAnyIP(443, listenOptions =>
+//     {
+//         listenOptions.UseHttps(httpsOptions =>
+//         {
+//             var certPath = builder.Configuration["Kestrel:Certificates:Default:Path"];
+//             var certPassword = builder.Configuration["Kestrel:Certificates:Default:Password"];
+            
+//             if (File.Exists(certPath))
+//             {
+//                 httpsOptions.ServerCertificate = new X509Certificate2(certPath, certPassword);
+//             }
+//         });
+//     });
+// });
 
 var app = builder.Build();
 
