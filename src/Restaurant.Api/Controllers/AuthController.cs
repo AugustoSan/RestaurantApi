@@ -7,6 +7,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Restaurant.Api.Application.Auth.Commands.Login;
+using Restaurant.Api.Application.Auth.Commands.RefreshToken;
 
 namespace Restaurant.Api.Controllers
 {
@@ -20,6 +21,11 @@ namespace Restaurant.Api.Controllers
 
         [HttpPost]
         public async Task<IActionResult> Login([FromBody] LoginCommand command)
+        {
+            return Ok(await _mediator.Send(command));
+        }
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenCommand command)
         {
             return Ok(await _mediator.Send(command));
         }

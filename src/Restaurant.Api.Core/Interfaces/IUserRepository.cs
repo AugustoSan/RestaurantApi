@@ -8,8 +8,5 @@ public interface IUserRepository {
     Task<User?> GetUserById(Guid id);
     Task<User?> GetUserByUsername(string username);
     Task<List<User>> GetAllUsers();
-    Task SaveRefreshTokenUser(RefreshTokenUser refreshTokenUser);
-    Task<User?> GetUserByRefreshToken(string refreshToken);
-    Task<RefreshTokenUser?> GetRefreshTokenUserByUser(Guid userId);
 }
 

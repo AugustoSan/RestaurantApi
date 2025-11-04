@@ -8,21 +8,15 @@ namespace Restaurant.Api.Infraestructure.Repositories;
 
 public class UserRepository : IUserRepository {
     private readonly IMongoCollection<User> _userCollection;
-    private readonly IMongoCollection<RefreshTokenUser> _refreshTokenUserCollection;
 
     public UserRepository(IMongoDatabase database)
     {
         _userCollection = database.GetCollection<User>("User");
-        _refreshTokenUserCollection = database.GetCollection<RefreshTokenUser>("RefreshTokenUser");
         // Create collection if it doesn't exist
         var collections = database.ListCollectionNames().ToList();
         if (!collections.Any(x => x == "User"))
         {
             database.CreateCollection("User");
-        }
-        if (!collections.Any(x => x == "RefreshTokenUser"))
-        {
-            database.CreateCollection("RefreshTokenUser");
         }
     }
     
@@ -51,18 +45,6 @@ public class UserRepository : IUserRepository {
 
     public async Task DeleteUser(Guid id) {
         await _userCollection.DeleteOneAsync(p => p.Id == id);
-    }
-    public async Task<User?> GetUserByRefreshToken(string refreshToken) {
-        var refreshTokenUser = await _refreshTokenUserCollection.Find(s => s.RefreshToken == refreshToken).FirstOrDefaultAsync();
-        return await _userCollection.Find(s => s.Id == refreshTokenUser.UserId).FirstOrDefaultAsync();
-    }
-
-    public async Task<RefreshTokenUser?> GetRefreshTokenUserByUser(Guid userId) {
-        return await _refreshTokenUserCollection.Find(s => s.UserId == userId).FirstOrDefaultAsync();
-    }
-
-    public async Task SaveRefreshTokenUser(RefreshTokenUser refreshTokenUser) {
-        await _refreshTokenUserCollection.ReplaceOneAsync(s => s.UserId == refreshTokenUser.UserId, refreshTokenUser, new ReplaceOptions { IsUpsert = true });
     }
 
 }
