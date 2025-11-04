@@ -6,7 +6,7 @@ public interface IJwtService {
     string GetRefreshToken(User user);
     bool VerifySessionToken(string token, string username);
     bool VerifyRefreshToken(string token, string username);
-    string GeneratePasswordHash(string password);
-    bool VerifyPassword(string password, string hash);
+    string GenerateHash(string value);
+    bool VerifyHash(string value, string hash);
 }
 

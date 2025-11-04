@@ -36,13 +36,11 @@ public class JwtService(IOptions<JwtSettings> settings, ILogger<JwtService> logg
     public bool VerifyRefreshToken(string token, string username) {
         return VerifyToken(token, "refresh_session", username);
     }
-
-    public bool VerifyPassword(string password, string hash) {
-        return BCrypt.Net.BCrypt.Verify(password, hash);
+    public string GenerateHash(string value) {
+        return BCrypt.Net.BCrypt.HashPassword(value);
     }
-
-    public string GeneratePasswordHash(string password) {
-        return BCrypt.Net.BCrypt.HashPassword(password);
+    public bool VerifyHash(string value, string hash) {
+        return BCrypt.Net.BCrypt.Verify(value, hash);
     }
 
     private string GenerateToken(string action, User user, int expiration) {
@@ -52,7 +50,7 @@ public class JwtService(IOptions<JwtSettings> settings, ILogger<JwtService> logg
         {
             Subject = new ClaimsIdentity(new[]
             {
-                new Claim(ClaimTypes.Name, user.Id.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Role, user.RoleId.ToString()),
                 new Claim("action", action)
             }),
