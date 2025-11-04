@@ -40,6 +40,7 @@ public class ProductRepository : IProductRepository {
                 _product.Price = product.Price;
                 _product.Description = product.Description;
                 _product.ImageUrl = product.ImageUrl;
+                _product.Available = product.Available;
                 category.Products.Remove(_product);
                 category.Products.Add(product);
                 await _categoryCollection.ReplaceOneAsync(p => p.Id == categoryId, category);

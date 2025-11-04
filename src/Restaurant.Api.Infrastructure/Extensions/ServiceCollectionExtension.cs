@@ -6,6 +6,8 @@ using Restaurant.Api.Core.Interfaces;
 using Restaurant.Api.Infraestructure.Repositories;
 using Restaurant.Api.Infrastructure.Configuration;
 using Restaurant.Api.Infrastructure.Persistance.Seeders;
+using Restaurant.Api.Infrastructure.Repositories;
+using Restaurant.Api.Infrastructure.Utils;
 
 namespace Restaurant.Api.Infrastructure.Extensions;
 
@@ -27,11 +29,20 @@ public static class ServiceCollectionExtension
             return client.GetDatabase(settings.DatabaseName);
         });
 
+        services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
+        
+        services.AddScoped<IJwtService, JwtService>();
+
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
 
-        services.AddScoped<ISeederPersistance, SeederPersistance>();
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IRoleRepository, RoleRepository>();
+        // services.AddScoped<IRestaurantRepository, RestaurantRepository>();
 
+        services.AddScoped<IAuthRepository, AuthRepository>();
+
+        services.AddScoped<ISeederPersistance, SeederPersistance>();
         return services;
     }
 }
