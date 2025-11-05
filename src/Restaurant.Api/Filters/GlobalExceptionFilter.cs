@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Restaurant.Api.Core.Exceptions;
 
+namespace Restaurant.Api.Filters;
+
 public class GlobalExceptionFilter : IExceptionFilter
 {
     private readonly IWebHostEnvironment _env;

@@ -1,13 +1,17 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
+using Restaurant.Api.Core.Exceptions;
 using Restaurant.Api.Core.Interfaces;
 using Restaurant.Api.Infraestructure.Repositories;
 using Restaurant.Api.Infrastructure.Configuration;
 using Restaurant.Api.Infrastructure.Persistance.Seeders;
 using Restaurant.Api.Infrastructure.Repositories;
 using Restaurant.Api.Infrastructure.Utils;
+using System.Text;
 
 namespace Restaurant.Api.Infrastructure.Extensions;
 
@@ -30,6 +34,48 @@ public static class ServiceCollectionExtension
         });
 
         services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
+
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                var jwtSettings = configuration.GetSection("JwtSettings").Get<JwtSettings>();
+
+                if (jwtSettings == null)
+                {
+                    throw new InfrastructureException("JwtSettings no se encontraron en la configuración");
+                }
+                
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = jwtSettings.Issuer,
+                    ValidAudience = jwtSettings.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
+                    ClockSkew = TimeSpan.Zero // No margin for token expiration time
+                };
+
+                // Handle token validation events for custom validation
+                options.Events = new JwtBearerEvents
+                {
+                    OnTokenValidated = context =>
+                    {
+                        // You can add custom validation here
+                        return Task.CompletedTask;
+                    },
+                    OnAuthenticationFailed = context =>
+                    {
+                        if (context.Exception is SecurityTokenExpiredException)
+                        {
+                            context.Response.Headers["Token-Expired"] = "true";
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
+            });
         
         services.AddScoped<IJwtService, JwtService>();
 

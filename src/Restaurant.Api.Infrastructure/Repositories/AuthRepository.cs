@@ -92,7 +92,7 @@ public class AuthRepository : IAuthRepository
         }
     }
 
-    public async Task<Auth> RefreshToken(string refreshToken) 
+    public async Task<Auth> RefreshToken(Guid userId, string refreshToken) 
     {
         if (string.IsNullOrEmpty(refreshToken))
         {
@@ -101,7 +101,7 @@ public class AuthRepository : IAuthRepository
 
         try
         {
-            var refreshTokenUser = await FindRefreshTokenByToken(refreshToken);
+            var refreshTokenUser = await FindRefreshToken(userId, refreshToken);
             if (refreshTokenUser == null)
             {
                 _logger.LogWarning("Intento de refrescar token fallido: Token no encontrado");
@@ -160,13 +160,13 @@ public class AuthRepository : IAuthRepository
         }
     }
 
-    private async Task<RefreshTokenUser?> FindRefreshTokenByToken(string refreshToken)
+    private async Task<RefreshTokenUser?> FindRefreshToken(Guid userId, string refreshToken)
     {
         try
         {
             return await RepositoryExceptionFilter.ExecuteWithExceptionHandlingAsync(
                 () => _refreshTokenUserCollection
-                    .Find(s => s.RefreshToken == refreshToken)
+                    .Find(s => s.UserId == userId && s.RefreshToken == refreshToken)
                     .FirstOrDefaultAsync(),
                 "RefreshToken",
                 refreshToken

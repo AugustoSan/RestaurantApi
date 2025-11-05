@@ -12,7 +12,7 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, A
     }
     public async Task<AuthDto> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
-        var token = await _authRepository.RefreshToken(request.RefreshToken);
+        var token = await _authRepository.RefreshToken(Guid.Parse(request.UserId), request.RefreshToken);
         return new AuthDto { Token = token.Token, RefreshToken = token.RefreshToken };
     }
 }

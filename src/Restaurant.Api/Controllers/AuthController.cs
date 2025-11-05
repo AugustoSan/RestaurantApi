@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Restaurant.Api.Application.Auth.Commands.Login;
@@ -25,8 +27,12 @@ namespace Restaurant.Api.Controllers
             return Ok(await _mediator.Send(command));
         }
         [HttpPost("refresh-token")]
-        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenCommand command)
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> RefreshToken([FromBody] string refreshToken)
         {
+            var command = new RefreshTokenCommand(refreshToken){
+                UserId = User.Identity?.Name ?? ""
+            };
             return Ok(await _mediator.Send(command));
         }
     }

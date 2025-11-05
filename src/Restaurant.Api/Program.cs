@@ -1,12 +1,8 @@
-using System;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
+using System.Reflection;
 using System.Threading.RateLimiting;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using MongoDB.Bson;
+using Microsoft.OpenApi.Models;
 using Restaurant.Api.Application.Extensions;
+using Restaurant.Api.Filters;
 using Restaurant.Api.Infrastructure.Extensions;
 using Restaurant.Api.Infrastructure.Persistance.Seeders;
 
@@ -29,24 +25,6 @@ builder.Services.AddControllers(
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// builder.WebHost.ConfigureKestrel(serverOptions =>
-// {
-//     serverOptions.ListenAnyIP(80);
-//     serverOptions.ListenAnyIP(443, listenOptions =>
-//     {
-//         listenOptions.UseHttps(httpsOptions =>
-//         {
-//             var certPath = builder.Configuration["Kestrel:Certificates:Default:Path"];
-//             var certPassword = builder.Configuration["Kestrel:Certificates:Default:Password"];
-            
-//             if (File.Exists(certPath))
-//             {
-//                 httpsOptions.ServerCertificate = new X509Certificate2(certPath, certPassword);
-//             }
-//         });
-//     });
-// });
-
 builder.Services.AddRateLimiter(options =>
 {
     options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
@@ -60,6 +38,40 @@ builder.Services.AddRateLimiter(options =>
             }));
 });
 
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    { 
+        Title = "Restaurant API", 
+        Version = "v1",
+        Description = "API para la gestión de restaurantes"
+    });
+
+    // Add JWT Authentication
+    var securityScheme = new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT"
+    };
+
+    options.AddSecurityDefinition("Bearer", securityScheme);
+
+    // Only apply security to endpoints that have [Authorize] attribute
+    options.OperationFilter<SecurityRequirementsOperationFilter>();
+
+    // Include XML comments if you have them
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    if (File.Exists(xmlPath))
+    {
+        options.IncludeXmlComments(xmlPath);
+    }
+});
+
 var app = builder.Build();
 
 var scope = app.Services.CreateScope();
@@ -70,10 +82,17 @@ await seederPersistance.SeedData();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Restaurant API V1");
+        options.RoutePrefix = "swagger";
+    });
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseRouting();
 app.MapControllers();
