@@ -1,0 +1,33 @@
+using Restaurant.Api.Application.User.Commands.Registry;
+using Restaurant.Api.Application.User.Dtos;
+using Restaurant.Api.Core.Entities;
+using CoreUser = Restaurant.Api.Core.Entities.User;
+
+namespace Restaurant.Api.Application.User.Mapper;
+
+public class UserMapper {
+    public static UserDto ToDto(CoreUser User) {
+        if (User == null)
+            throw new ArgumentNullException(nameof(User));
+        return new UserDto {
+            Id = User.Id.ToString(),
+            Name = User.Name,
+            Username = User.Username,
+            Password = "************",
+            RoleId = User.RoleId.ToString()
+        };
+    }
+    public static CoreUser Registry(RegistryCommand command) {
+        if (command == null)
+            throw new ArgumentNullException(nameof(command));
+        return new CoreUser {
+            Id = Guid.NewGuid(),
+            Name = command.Name,
+            Username = command.Username,
+            Password = command.Password,
+            RoleId = Guid.Parse(command.RoleId),
+            CreatedAt = DateTime.Now,
+            UpdatedAt = DateTime.Now
+        };
+    }
+}
