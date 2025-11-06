@@ -27,3 +27,5 @@ Ejecutar el proyecto
 ~~~bash  
 dotnet run --project src/Restaurant.Api/Restaurant.Api.csproj 
 ~~~  
+
+Para visitar swagger(http://localhost:5035/swagger/index.html)
