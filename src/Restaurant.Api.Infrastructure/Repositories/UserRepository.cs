@@ -43,8 +43,26 @@ public class UserRepository : IUserRepository {
         await _userCollection.ReplaceOneAsync(p => p.Id == id, user);
     }
 
-    public async Task DeleteUser(Guid id) {
+    public async Task DeleteUser(Guid id)
+    {
         await _userCollection.DeleteOneAsync(p => p.Id == id);
+    }
+
+    public async Task ChangePassword(Guid id, string password, string newPassword)
+    {
+        var user = await GetUserById(id);
+        if (user == null) return;
+        if (!BCrypt.Net.BCrypt.Verify(password, user.Password)) return;
+        user.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
+        await UpdateUser(id, user);
+    }
+
+    public async Task ChangeRole(Guid id, Guid roleId)
+    {
+        var user = await GetUserById(id);
+        if (user == null) return;
+        user.RoleId = roleId;
+        await UpdateUser(id, user);
     }
 
 }
