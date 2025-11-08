@@ -7,20 +7,38 @@ namespace Restaurant.Api.Infrastructure.Persistance.Seeders;
 public class SeederPersistance(
     ICategoryRepository categoryRepository,
     IRoleRepository roleRepository,
-    IUserRepository userRepository
+    IUserRepository userRepository,
+    IEstablishmentRepository restaurantRepository
 ) : ISeederPersistance
 {
     private readonly ICategoryRepository _categoryRepository = categoryRepository;
     private readonly IRoleRepository _roleRepository = roleRepository;
     private readonly IUserRepository _userRepository = userRepository;
+    private readonly IEstablishmentRepository _restaurantRepository = restaurantRepository;
     private readonly Guid _adminRoleId = Guid.NewGuid();
     private readonly Guid _userRoleId = Guid.NewGuid();
-    
+
     public async Task SeedData()
     {
         await SeedRoles();
         await SeedUsers();
         await SeedCategories();
+        await SeedRestaurants();
+    }
+
+    private async Task SeedRestaurants()
+    {
+        var restaurant = await _restaurantRepository.GetInfo();
+        if(restaurant == null)
+        {
+            await _restaurantRepository.AddOrUpdate(new Establishment
+            {
+                Id = Guid.NewGuid(),
+                Name = "Chicle Café & Sancks",
+                Description = "Cafeterìa",
+                Token = Guid.NewGuid().ToString()
+            });
+        }
     }
 
     private async Task SeedRoles()
