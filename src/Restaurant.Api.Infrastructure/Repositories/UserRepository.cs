@@ -2,21 +2,29 @@ using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Restaurant.Api.Core.Entities;
 using Restaurant.Api.Core.Interfaces;
+using Restaurant.Api.Core.Options;
 using Restaurant.Api.Infrastructure.Configuration;
 
 namespace Restaurant.Api.Infraestructure.Repositories;
 
 public class UserRepository : IUserRepository {
     private readonly IMongoCollection<User> _userCollection;
+    private readonly UserOptions userOptions;
 
-    public UserRepository(IMongoDatabase database)
+    public UserRepository(IMongoDatabase database, IOptions<InitialValue> settings)
     {
+        userOptions = settings.Value.Administrator;
         _userCollection = database.GetCollection<User>("User");
         // Create collection if it doesn't exist
         var collections = database.ListCollectionNames().ToList();
         if (!collections.Any(x => x == "User"))
         {
             database.CreateCollection("User");
+
+            var indexKeysDefinition = Builders<User>.IndexKeys.Ascending(u => u.Username);
+            var indexOptions = new CreateIndexOptions { Unique = true };
+            var indexModel = new CreateIndexModel<User>(indexKeysDefinition, indexOptions);
+            _userCollection.Indexes.CreateOne(indexModel);
         }
     }
     
@@ -45,6 +53,9 @@ public class UserRepository : IUserRepository {
 
     public async Task DeleteUser(Guid id)
     {
+        var administrator = await GetUserByUsername(userOptions.Username);
+        if (administrator != null && administrator.Id == id) return;
+
         await _userCollection.DeleteOneAsync(p => p.Id == id);
     }
 

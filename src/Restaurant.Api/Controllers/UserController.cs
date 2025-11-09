@@ -17,6 +17,7 @@ using Restaurant.Api.Application.User.Queries.GetAllUsers;
 using Restaurant.Api.Application.User.Queries.GetUserById;
 using Restaurant.Api.Application.User.Commands.ChangePassword;
 using Restaurant.Api.Application.User.Commands.ChangeRole;
+using Restaurant.Api.Application.User.Commands.Delete;
 
 namespace Restaurant.Api.Controllers
 {
@@ -32,6 +33,7 @@ namespace Restaurant.Api.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> Get()
         {
+            _logger.LogInformation("Getting all users");
             return Ok(await _mediator.Send(new GetAllUsersQuery()));
         }
         [HttpGet("{id}")]
@@ -67,6 +69,13 @@ namespace Restaurant.Api.Controllers
         {
             command.Id = id;
             return Ok(await _mediator.Send(command));
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> Delete([FromRoute] string id)
+        {
+            return Ok(await _mediator.Send(new DeleteCommand(){Id = id}));
         }
     }
 }

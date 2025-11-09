@@ -48,7 +48,8 @@ public class ProductRepository : IProductRepository {
         }
     }
 
-    public async Task DeleteProduct(Guid categoryId, Guid id) {
+    public async Task DeleteProduct(Guid categoryId, Guid id)
+    {
         Category? category = await GetCategoryById(categoryId);
         if (category != null)
         {
@@ -60,6 +61,23 @@ public class ProductRepository : IProductRepository {
             }
         }
     }
+
+    public async Task<List<Product>> GetAllProductsByCategoryId(Guid categoryId)
+    {
+        Category? category = await GetCategoryById(categoryId);
+        return category?.Products ?? new List<Product>();
+    }
+    
+    public async Task<Product?> GetProductById(Guid categoryId, Guid id)
+    {
+        Category? category = await GetCategoryById(categoryId);
+        if (category != null)
+        {
+            return category.Products.Find(p => p.Id == id);
+        }
+        return null;
+    }
+
 
     private async Task<Category?> GetCategoryById(Guid categoryId) {
         return await _categoryCollection.Find(p => p.Id == categoryId).FirstOrDefaultAsync();

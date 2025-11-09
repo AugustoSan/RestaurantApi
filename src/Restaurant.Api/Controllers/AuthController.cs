@@ -24,6 +24,17 @@ namespace Restaurant.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Login([FromBody] LoginCommand command)
         {
+            // 1. Datos de la Conexión
+            var remoteIp = HttpContext.Connection.RemoteIpAddress?.ToString();
+            var localIp = HttpContext.Connection.LocalIpAddress?.ToString();
+            var hostName = HttpContext.Request.Host.Value;
+            
+            // 2. Datos del Dispositivo (a través del User-Agent)
+            var userAgent = HttpContext.Request.Headers["User-Agent"].ToString();
+
+            _logger.LogInformation("Solicitud recibida por el usuario {Username}. IP Cliente: {RemoteIp}, Host: {HostName}, User-Agent: {UserAgent}, IP Servidor: {LocalIp}",
+                command.Username, remoteIp, hostName, userAgent, localIp);
+                
             return Ok(await _mediator.Send(command));
         }
         [HttpPost("refresh-token")]
