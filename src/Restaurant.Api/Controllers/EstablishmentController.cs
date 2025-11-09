@@ -18,6 +18,7 @@ using Restaurant.Api.Application.User.Queries.GetUserById;
 using Restaurant.Api.Application.User.Commands.ChangePassword;
 using Restaurant.Api.Application.User.Commands.ChangeRole;
 using Restaurant.Api.Application.Establishment.Queries.GetInfoEstablishment;
+using Restaurant.Api.Application.Establishment.Commands;
 
 namespace Restaurant.Api.Controllers
 {
@@ -35,11 +36,11 @@ namespace Restaurant.Api.Controllers
         {
             return Ok(await _mediator.Send(new GetInfoEstablishmentQuery()));
         }
-        // [HttpPatch()]
-        // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        // public async Task<IActionResult> Update([FromBody] UpdateCommand command)
-        // {
-        //     return Ok(await _mediator.Send(command));
-        // }
+        [HttpPatch()]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> Update([FromBody] UpdateEstablishmentCommand command)
+        {
+            return Ok(await _mediator.Send(command));
+        }
     }
 }

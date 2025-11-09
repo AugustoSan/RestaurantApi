@@ -20,13 +20,17 @@ public class EstablishmentRepository : IEstablishmentRepository {
         }
     }
 
-    public async Task AddOrUpdate(Establishment restaurant)
+    public async Task Update(Establishment restaurant)
     {
 
         var establishment = await GetInfo();
         if (establishment == null)
         {
             await _establishmentCollection.InsertOneAsync(restaurant);
+        }
+        else
+        {
+            await _establishmentCollection.ReplaceOneAsync(p => p.Id == establishment.Id, restaurant);
         }
         return;
     }

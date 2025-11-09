@@ -1,6 +1,8 @@
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Restaurant.Api.Core.Entities;
 using Restaurant.Api.Core.Interfaces;
+using Restaurant.Api.Core.Options;
 
 namespace Restaurant.Api.Infrastructure.Persistance.Seeders;
 
@@ -8,13 +10,15 @@ public class SeederPersistance(
     ICategoryRepository categoryRepository,
     IRoleRepository roleRepository,
     IUserRepository userRepository,
-    IEstablishmentRepository restaurantRepository
+    IEstablishmentRepository restaurantRepository,
+    IOptions<InitialValue> initialValue
 ) : ISeederPersistance
 {
     private readonly ICategoryRepository _categoryRepository = categoryRepository;
     private readonly IRoleRepository _roleRepository = roleRepository;
     private readonly IUserRepository _userRepository = userRepository;
     private readonly IEstablishmentRepository _restaurantRepository = restaurantRepository;
+    private readonly InitialValue _initialValue = initialValue.Value;
     private readonly Guid _adminRoleId = Guid.NewGuid();
     private readonly Guid _userRoleId = Guid.NewGuid();
 
@@ -28,15 +32,22 @@ public class SeederPersistance(
 
     private async Task SeedRestaurants()
     {
+        if (_initialValue.Establishment == null)
+            throw new ArgumentNullException("No hay algun dato initial para establecimiento");
+        var establishment = _initialValue.Establishment;
         var restaurant = await _restaurantRepository.GetInfo();
         if(restaurant == null)
         {
-            await _restaurantRepository.AddOrUpdate(new Establishment
+            await _restaurantRepository.Update(new Establishment
             {
                 Id = Guid.NewGuid(),
-                Name = "Chicle Café & Sancks",
-                Description = "Cafeterìa",
-                Token = Guid.NewGuid().ToString()
+                Name = establishment.Name,
+                Address = establishment.Address,
+                Phone = establishment.Phone,
+                Description = establishment.Description,
+                Logo = establishment.Logo,
+                Email = establishment.Email,
+                Token = establishment.Token
             });
         }
     }
@@ -65,20 +76,26 @@ public class SeederPersistance(
 
     private async Task SeedUsers()
     {
+        if (_initialValue.Administrator == null)
+            throw new ArgumentNullException("No hay algun dato initial para el usuario administrador");
+        var administrator = _initialValue.Administrator;
         var roles = await _roleRepository.GetAllRoles();
-        var users = await _userRepository.GetAllUsers();
-        if (users.Count == 0 && roles.Count > 0)
+        var user = await _userRepository.GetUserByUsername(administrator.Username);
+        if (roles.Count > 0)
         {
-            await _userRepository.AddUser(new User
+            if(user == null)
             {
-                Id = Guid.NewGuid(),
-                Name = "Administrador",
-                Username = "admin",
-                Password = "admin",
-                RoleId = _adminRoleId,
-                CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now
-            });
+                await _userRepository.AddUser(new User
+                {
+                    Id = Guid.NewGuid(),
+                    Name = administrator.Name,
+                    Username = administrator.Username,
+                    Password = administrator.Password,
+                    RoleId = _adminRoleId,
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now
+                });
+            }
         }
     }
 

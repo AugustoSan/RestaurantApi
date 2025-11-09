@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 using Restaurant.Api.Core.Exceptions;
 using Restaurant.Api.Core.Interfaces;
+using Restaurant.Api.Core.Options;
 using Restaurant.Api.Infraestructure.Repositories;
 using Restaurant.Api.Infrastructure.Configuration;
 using Restaurant.Api.Infrastructure.Persistance.Seeders;
@@ -88,6 +89,8 @@ public static class ServiceCollectionExtension
         // services.AddScoped<IRestaurantRepository, RestaurantRepository>();
 
         services.AddScoped<IAuthRepository, AuthRepository>();
+
+        services.Configure<InitialValue>(configuration.GetSection("InitialValue"));
 
         services.AddScoped<ISeederPersistance, SeederPersistance>();
         return services;
