@@ -29,11 +29,13 @@ namespace Restaurant.Api.Controllers
 
 
         [HttpGet]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> Get()
         {
             return Ok(await _mediator.Send(new GetAllUsersQuery()));
         }
         [HttpGet("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> GetById([FromRoute] string id)
         {
             return Ok(await _mediator.Send(new GetUserByIdQuery(){Id = id}));

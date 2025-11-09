@@ -41,7 +41,7 @@ public class EstablishmentMapper {
             throw new ArgumentNullException(nameof(establishmentDto));
         return new CoreEstablishment {
             Id = Guid.Parse(establishmentDto.Id),
-            Token = establishmentDto.Token,
+            Token = establishment.Token,
             Name = establishmentDto.Name ?? establishment.Name,
             Description = establishmentDto.Description ?? establishment.Description,
             Address = establishmentDto.Address ?? establishment.Address,
