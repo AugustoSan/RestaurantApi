@@ -29,3 +29,23 @@ dotnet run --project src/Restaurant.Api/Restaurant.Api.csproj
 ~~~  
 
 Para visitar swagger(http://localhost:5035/swagger/index.html)
+
+## Ejecucion con docker
+
+Creación de la imagen docker
+
+~~~bash  
+docker buildx build -t restaurantapi:latest .
+~~~  
+
+Deploguear la imagen docker con docker compose con mongo y el volumen
+
+~~~bash  
+docker compose up -d
+~~~  
+
+Deploguear solo la imagen
+
+~~~bash  
+docker compose up api -d
+~~~  

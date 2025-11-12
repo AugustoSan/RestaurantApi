@@ -2,16 +2,31 @@ version: '3.8'
 
 services:
   api:
-    build: .
+    image: restaurantapi:latest
     ports:
-      - "5000:80"  # Mapea el puerto 80 del contenedor al 5000 del host
+      - "5001:80"  # Mapea el puerto 80 del contenedor al 5000 del host
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80  # Solo HTTP
       - MongoDbSettings__ConnectionString=mongodb://mongoadmin:secret@mongodb:27017/admin?authSource=admin
       - MongoDbSettings__DatabaseName=RestaurantDb
-    depends_on:
-      - mongodb
+      - JwtSettings__SecretKey=secretKey
+      - JwtSettings__Issuer=issuer
+      - JwtSettings__Audience=audience
+      - JwtSettings__TokenSessionExpiration=30
+      - JwtSettings__TokenRefreshExpiration=1440
+      - InitialValue__Establishment__Name=Restaurante
+      - InitialValue__Establishment__Descrption=Descripción
+      - InitialValue__Establishment__Token=token
+      - InitialValue__Establishment__Address=-
+      - InitialValue__Establishment__Phone=-
+      - InitialValue__Establishment__Logo=-
+      - InitialValue__Establishment__Email=
+      - InitialValue__Administrator__Name=Administrador
+      - InitialValue__Administrator__Username=admin
+      - InitialValue__Administrator__Password=admin
+    # depends_on:
+    #   - mongodb
 
   mongodb:
     image: mongo:6.0
