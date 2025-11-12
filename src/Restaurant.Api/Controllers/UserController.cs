@@ -40,7 +40,15 @@ namespace Restaurant.Api.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> GetById([FromRoute] string id)
         {
-            return Ok(await _mediator.Send(new GetUserByIdQuery(){Id = id}));
+            return Ok(await _mediator.Send(new GetUserByIdQuery() { Id = id }));
+        }
+        [HttpGet("perfil")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> GetPerfil()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null) return Unauthorized();
+            return Ok(await _mediator.Send(new GetUserByIdQuery(){Id = userId}));
         }
         [HttpPost("registry")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
